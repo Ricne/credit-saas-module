@@ -38,10 +38,16 @@ export function AppLayout() {
           </NavLink>
 
           {user?.role === "ADMIN" && (
-            <NavLink to="/admin/packages" style={navStyle}>
+            <>
+              <NavLink to="/admin/packages" style={navStyle}>
                 Admin Packages
-            </NavLink>
-            )}
+              </NavLink>
+
+              <NavLink to="/admin/features" style={navStyle}>
+                Admin Features
+              </NavLink>
+            </>
+          )}
         </nav>
 
         <div style={styles.userBox}>

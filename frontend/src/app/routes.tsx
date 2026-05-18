@@ -9,6 +9,7 @@ import { RegisterPage } from "../pages/RegisterPage";
 import { WalletPage } from "../pages/WalletPage";
 import { AdminPackagesPage } from "../pages/AdminPackagesPage";
 import { TransactionsPage } from "../pages/TransactionsPage";
+import { AdminFeaturesPage } from "../pages/AdminFeaturesPage";
 
 export const router = createBrowserRouter([
   {
@@ -38,7 +39,11 @@ export const router = createBrowserRouter([
       {
         path: "admin/packages",
         element: <AdminPackagesPage />,
-    },
+      },
+      {
+        path: "admin/features",
+        element: <AdminFeaturesPage />,
+      },
     ],
   },
   {

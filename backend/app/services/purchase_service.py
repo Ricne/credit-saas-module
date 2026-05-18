@@ -46,6 +46,31 @@ class PurchaseService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Wallet not found",
             )
+        payment = payload.payment
+
+        if not payment.card_number.isdigit():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Card number must contain digits only",
+            )
+
+        if not payment.cvv.isdigit():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="CVV must contain digits only",
+            )
+
+        if not payment.expiry_month.isdigit() or not 1 <= int(payment.expiry_month) <= 12:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid expiry month",
+            )
+
+        if not payment.expiry_year.isdigit():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid expiry year",
+            )
 
         balance_before = wallet.balance
         balance_after = balance_before + package.credits

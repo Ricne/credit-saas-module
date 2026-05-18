@@ -27,3 +27,23 @@ export type PackageCreatePayload = {
 export type PackageUpdatePayload = Partial<PackageCreatePayload> & {
   status?: string;
 };
+
+export type AdminFeature = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type FeatureCreatePayload = {
+  code: string;
+  name: string;
+  description?: string;
+};
+
+export type FeatureUpdatePayload = Partial<FeatureCreatePayload> & {
+  is_active?: boolean;
+};
