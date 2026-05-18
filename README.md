@@ -44,7 +44,7 @@ http://localhost:8000/docs
 
 ## Admin
 
-[user@example.com]
+[admin@gmail.com]
 
 123456
 
