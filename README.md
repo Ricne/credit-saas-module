@@ -4,7 +4,7 @@
 
 ### 1. Clone project
 
-git clone <repo-url>
+git clone <https://github.com/Ricne/credit-saas-module.git>
 
 cd credit-saas
 
@@ -44,13 +44,13 @@ http://localhost:8000/docs
 
 ## Admin
 
-[user@example.com](mailto:user@example.com)
+[user@example.com]
 
 123456
 
 ## User
 
-[buyer@example.com](mailto:buyer@example.com)
+[phuclong@gmail.com]
 
 123456
 
