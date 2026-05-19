@@ -48,7 +48,8 @@ class PurchaseService:
             )
         payment = payload.payment
 
-        if not payment.card_number.isdigit():
+        card_number = payment.card_number.replace(" ", "")
+        if not card_number.isdigit():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Card number must contain digits only",

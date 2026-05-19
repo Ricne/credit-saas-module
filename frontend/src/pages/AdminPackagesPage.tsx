@@ -1,12 +1,12 @@
 import { type FormEvent, useEffect, useState } from "react";
 
+import { featuresApi } from "../api/features.api";
 import { packagesApi } from "../api/packages.api";
-import type { Package } from "../types/package";
-
-const FEATURE_OPTIONS = ["AI_CHAT", "IMAGE_GENERATION", "EXPORT_HD", "AUTO_POST"];
+import type { AdminFeature, Package } from "../types/package";
 
 export function AdminPackagesPage() {
   const [packages, setPackages] = useState<Package[]>([]);
+  const [availableFeatures, setAvailableFeatures] = useState<AdminFeature[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
 
@@ -14,14 +14,29 @@ export function AdminPackagesPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(9.99);
   const [credits, setCredits] = useState(100);
-  const [featureCodes, setFeatureCodes] = useState<string[]>(["AI_CHAT"]);
+  const [featureCodes, setFeatureCodes] = useState<string[]>([]);
 
   async function loadPackages() {
+    const data = await packagesApi.list();
+    setPackages(data);
+  }
+
+  async function loadAvailableFeatures() {
+    const data = await featuresApi.adminList();
+    const activeFeatures = data.filter((feature) => feature.is_active);
+
+    setAvailableFeatures(activeFeatures);
+
+    if (featureCodes.length === 0 && activeFeatures.length > 0) {
+      setFeatureCodes([activeFeatures[0].code]);
+    }
+  }
+
+  async function loadData() {
     setIsLoading(true);
 
     try {
-      const data = await packagesApi.list();
-      setPackages(data);
+      await Promise.all([loadPackages(), loadAvailableFeatures()]);
     } finally {
       setIsLoading(false);
     }
@@ -30,6 +45,11 @@ export function AdminPackagesPage() {
   async function handleCreate(event: FormEvent) {
     event.preventDefault();
     setMessage("");
+
+    if (featureCodes.length === 0) {
+      setMessage("Please select at least one active feature.");
+      return;
+    }
 
     try {
       await packagesApi.create({
@@ -45,9 +65,11 @@ export function AdminPackagesPage() {
       setDescription("");
       setPrice(9.99);
       setCredits(100);
-      setFeatureCodes(["AI_CHAT"]);
+      setFeatureCodes(
+        availableFeatures.length > 0 ? [availableFeatures[0].code] : []
+      );
 
-      await loadPackages();
+      await loadData();
     } catch {
       setMessage("Create package failed.");
     }
@@ -65,7 +87,7 @@ export function AdminPackagesPage() {
       });
 
       setMessage("Package updated successfully.");
-      await loadPackages();
+      await loadData();
     } catch {
       setMessage("Update package failed.");
     }
@@ -81,7 +103,7 @@ export function AdminPackagesPage() {
     try {
       await packagesApi.delete(packageId);
       setMessage("Package archived successfully.");
-      await loadPackages();
+      await loadData();
     } catch {
       setMessage("Delete package failed.");
     }
@@ -96,7 +118,7 @@ export function AdminPackagesPage() {
   }
 
   useEffect(() => {
-    loadPackages();
+    loadData();
   }, []);
 
   return (
@@ -108,6 +130,10 @@ export function AdminPackagesPage() {
             Create, update, and archive credit packages.
           </p>
         </div>
+
+        <button style={styles.refreshButton} onClick={loadData}>
+          Refresh
+        </button>
       </div>
 
       {message && <div style={styles.message}>{message}</div>}
@@ -165,23 +191,29 @@ export function AdminPackagesPage() {
           <div>
             <div style={styles.label}>Features</div>
 
-            <div style={styles.featureOptions}>
-              {FEATURE_OPTIONS.map((code) => (
-                <button
-                  key={code}
-                  type="button"
-                  style={{
-                    ...styles.featureOption,
-                    ...(featureCodes.includes(code)
-                      ? styles.featureOptionActive
-                      : {}),
-                  }}
-                  onClick={() => toggleFeature(code)}
-                >
-                  {code}
-                </button>
-              ))}
-            </div>
+            {availableFeatures.length === 0 ? (
+              <p style={styles.empty}>
+                No active features found. Create or enable a feature first.
+              </p>
+            ) : (
+              <div style={styles.featureOptions}>
+                {availableFeatures.map((feature) => (
+                  <button
+                    key={feature.id}
+                    type="button"
+                    style={{
+                      ...styles.featureOption,
+                      ...(featureCodes.includes(feature.code)
+                        ? styles.featureOptionActive
+                        : {}),
+                    }}
+                    onClick={() => toggleFeature(feature.code)}
+                  >
+                    {feature.code}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <button style={styles.primaryButton}>Create package</button>
@@ -212,8 +244,11 @@ export function AdminPackagesPage() {
                     <td style={styles.td}>
                       <strong>{item.name}</strong>
                     </td>
+
                     <td style={styles.td}>${item.price}</td>
+
                     <td style={styles.td}>{item.credits}</td>
+
                     <td style={styles.td}>
                       <div style={styles.badges}>
                         {item.features.map((feature) => (
@@ -223,6 +258,7 @@ export function AdminPackagesPage() {
                         ))}
                       </div>
                     </td>
+
                     <td style={styles.td}>
                       <div style={styles.actions}>
                         <button
@@ -253,6 +289,9 @@ export function AdminPackagesPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 24,
   },
   title: {
@@ -262,6 +301,14 @@ const styles: Record<string, React.CSSProperties> = {
   subtitle: {
     color: "#6b7280",
     marginTop: 8,
+  },
+  refreshButton: {
+    padding: "10px 14px",
+    border: "1px solid #d1d5db",
+    borderRadius: 12,
+    background: "#ffffff",
+    fontWeight: 700,
+    cursor: "pointer",
   },
   message: {
     background: "#eff6ff",
@@ -308,6 +355,9 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     border: "1px solid #d1d5db",
     fontSize: 14,
+  },
+  empty: {
+    color: "#6b7280",
   },
   featureOptions: {
     display: "flex",

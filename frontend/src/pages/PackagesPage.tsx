@@ -2,8 +2,8 @@ import { type FormEvent, useEffect, useState } from "react";
 
 import { packagesApi } from "../api/packages.api";
 import { purchasesApi } from "../api/purchases.api";
-import type { Package } from "../types/package";
 import { useAuthStore } from "../stores/auth.store";
+import type { Package } from "../types/package";
 
 type CheckoutForm = {
   cardholder_name: string;
@@ -49,16 +49,48 @@ export function PackagesPage() {
 
     setCheckoutForm({
       cardholder_name: "",
-      card_number: "",
-      expiry_month: "",
-      expiry_year: "",
-      cvv: "",
+      card_number: "4242 4242 4242 4242",
+      expiry_month: "12",
+      expiry_year: "2030",
+      cvv: "123",
       billing_email: user?.email || "",
     });
   }
 
   function closeCheckout() {
+    if (buyingId) return;
     setSelectedPackage(null);
+  }
+
+  function formatCardNumber(value: string) {
+    return value
+      .replace(/\D/g, "")
+      .slice(0, 16)
+      .replace(/(.{4})/g, "$1 ")
+      .trim();
+  }
+
+  function getCardDigits(value: string) {
+    return value.replace(/\D/g, "");
+  }
+
+  function formatMonth(value: string) {
+    return value.replace(/\D/g, "").slice(0, 2);
+  }
+
+  function formatYear(value: string) {
+    return value.replace(/\D/g, "").slice(0, 4);
+  }
+
+  function formatCvv(value: string) {
+    return value.replace(/\D/g, "").slice(0, 4);
+  }
+
+  function updateCheckoutField(field: keyof CheckoutForm, value: string) {
+    setCheckoutForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
   }
 
   async function handleConfirmPurchase(event: FormEvent) {
@@ -70,7 +102,10 @@ export function PackagesPage() {
     setMessage("");
 
     try {
-      const result = await purchasesApi.purchase(selectedPackage.id, checkoutForm);
+      const result = await purchasesApi.purchase(selectedPackage.id, {
+        ...checkoutForm,
+        card_number: getCardDigits(checkoutForm.card_number),
+      });
 
       setMessage(
         `Purchased ${result.package_name}. Balance: ${result.balance_after} credits.`
@@ -82,13 +117,6 @@ export function PackagesPage() {
     } finally {
       setBuyingId(null);
     }
-  }
-
-  function updateCheckoutField(field: keyof CheckoutForm, value: string) {
-    setCheckoutForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
   }
 
   useEffect(() => {
@@ -152,7 +180,12 @@ export function PackagesPage() {
                 </p>
               </div>
 
-              <button style={styles.closeButton} onClick={closeCheckout}>
+              <button
+                type="button"
+                style={styles.closeButton}
+                onClick={closeCheckout}
+                disabled={Boolean(buyingId)}
+              >
                 ×
               </button>
             </div>
@@ -175,11 +208,16 @@ export function PackagesPage() {
                 <span>Card number</span>
                 <input
                   style={styles.input}
+                  inputMode="numeric"
+                  autoComplete="cc-number"
                   value={checkoutForm.card_number}
                   onChange={(event) =>
-                    updateCheckoutField("card_number", event.target.value)
+                    updateCheckoutField(
+                      "card_number",
+                      formatCardNumber(event.target.value)
+                    )
                   }
-                  placeholder="1234 1234 1234 1234"
+                  placeholder="4242 4242 4242 4242"
                   required
                 />
               </label>
@@ -189,9 +227,14 @@ export function PackagesPage() {
                   <span>Expiry month</span>
                   <input
                     style={styles.input}
+                    inputMode="numeric"
+                    autoComplete="cc-exp-month"
                     value={checkoutForm.expiry_month}
                     onChange={(event) =>
-                      updateCheckoutField("expiry_month", event.target.value)
+                      updateCheckoutField(
+                        "expiry_month",
+                        formatMonth(event.target.value)
+                      )
                     }
                     placeholder="12"
                     required
@@ -202,22 +245,29 @@ export function PackagesPage() {
                   <span>Expiry year</span>
                   <input
                     style={styles.input}
+                    inputMode="numeric"
+                    autoComplete="cc-exp-year"
                     value={checkoutForm.expiry_year}
                     onChange={(event) =>
-                      updateCheckoutField("expiry_year", event.target.value)
+                      updateCheckoutField(
+                        "expiry_year",
+                        formatYear(event.target.value)
+                      )
                     }
                     placeholder="2030"
                     required
                   />
                 </label>
 
-                <label style={{ ...styles.field, maxWidth: 120 }}>
+                <label style={styles.field}>
                   <span>CVV</span>
                   <input
                     style={styles.input}
+                    inputMode="numeric"
+                    autoComplete="cc-csc"
                     value={checkoutForm.cvv}
                     onChange={(event) =>
-                      updateCheckoutField("cvv", event.target.value)
+                      updateCheckoutField("cvv", formatCvv(event.target.value))
                     }
                     placeholder="123"
                     required
@@ -229,6 +279,7 @@ export function PackagesPage() {
                 <span>Billing email</span>
                 <input
                   style={styles.input}
+                  type="email"
                   value={checkoutForm.billing_email}
                   onChange={(event) =>
                     updateCheckoutField("billing_email", event.target.value)
@@ -237,6 +288,11 @@ export function PackagesPage() {
                   required
                 />
               </label>
+
+              <div style={styles.fakeNotice}>
+                This is a fake payment form for testing only. No card data is
+                stored.
+              </div>
 
               <button
                 style={styles.payButton}

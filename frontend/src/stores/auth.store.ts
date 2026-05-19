@@ -62,9 +62,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     try {
       const user = await authApi.me();
+      const token = localStorage.getItem("access_token");
 
       set({
         user,
+        token,
         isAuthenticated: true,
       });
     } catch {
