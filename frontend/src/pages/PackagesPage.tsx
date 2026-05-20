@@ -316,14 +316,17 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "space-between",
     marginBottom: 24,
   },
+
   title: {
     fontSize: 32,
     margin: 0,
   },
+
   subtitle: {
     color: "#6b7280",
     marginTop: 8,
   },
+
   message: {
     background: "#ecfdf5",
     color: "#047857",
@@ -333,11 +336,13 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: 20,
     fontWeight: 600,
   },
+
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
     gap: 20,
   },
+
   card: {
     background: "#ffffff",
     border: "1px solid #e5e7eb",
@@ -347,33 +352,53 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     gap: 20,
     boxShadow: "0 10px 25px rgba(15, 23, 42, 0.06)",
+    minWidth: 0,
+    overflow: "hidden",
   },
+
   packageName: {
     fontSize: 24,
     margin: 0,
+    lineHeight: 1.2,
+    wordBreak: "break-word",
   },
+
   description: {
     color: "#6b7280",
     minHeight: 44,
+    lineHeight: 1.5,
+    wordBreak: "break-word",
   },
+
   priceRow: {
     display: "flex",
     alignItems: "baseline",
     justifyContent: "space-between",
+    gap: 12,
+    minWidth: 0,
+    flexWrap: "wrap",
   },
+
   price: {
     fontSize: 32,
     fontWeight: 800,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
   },
+
   credits: {
     color: "#4f46e5",
     fontWeight: 700,
+    textAlign: "right",
+    wordBreak: "break-word",
   },
+
   features: {
     display: "flex",
     flexWrap: "wrap",
     gap: 8,
   },
+
   featureBadge: {
     background: "#eef2ff",
     color: "#3730a3",
@@ -382,6 +407,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontWeight: 600,
   },
+
   buyButton: {
     marginTop: "auto",
     padding: "12px 14px",
@@ -392,6 +418,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     cursor: "pointer",
   },
+
   modalBackdrop: {
     position: "fixed",
     inset: 0,
@@ -401,6 +428,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 24,
     zIndex: 50,
   },
+
   modal: {
     width: "min(560px, 100%)",
     background: "#ffffff",
@@ -408,20 +436,24 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 28,
     boxShadow: "0 30px 80px rgba(0,0,0,0.25)",
   },
+
   modalHeader: {
     display: "flex",
     justifyContent: "space-between",
     gap: 16,
     marginBottom: 20,
   },
+
   modalTitle: {
     margin: 0,
     fontSize: 28,
   },
+
   modalSubtitle: {
     color: "#6b7280",
     marginBottom: 0,
   },
+
   closeButton: {
     width: 36,
     height: 36,
@@ -431,28 +463,33 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 24,
     cursor: "pointer",
   },
+
   form: {
     display: "flex",
     flexDirection: "column",
     gap: 14,
   },
+
   formGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr 1fr",
     gap: 12,
   },
+
   field: {
     display: "flex",
     flexDirection: "column",
     gap: 7,
     fontWeight: 700,
   },
+
   input: {
     padding: "12px 14px",
     borderRadius: 12,
     border: "1px solid #d1d5db",
     fontSize: 14,
   },
+
   fakeNotice: {
     background: "#fffbeb",
     color: "#92400e",
@@ -462,6 +499,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     fontSize: 13,
   },
+
   payButton: {
     padding: "13px 16px",
     borderRadius: 14,
