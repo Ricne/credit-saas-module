@@ -79,7 +79,13 @@ export function WalletPage() {
             <div style={styles.featureList}>
               {features.map((feature) => (
                 <div key={feature.id} style={styles.featureItem}>
-                  <span style={styles.featureCode}>{feature.feature_code}</span>
+                  <div>
+                    <span style={styles.featureCode}>{feature.feature_code}</span>
+                    <div style={styles.featurePackage}>
+                      From package: {feature.package_name}
+                    </div>
+                  </div>
+
                   <span style={styles.featureDate}>
                     {formatDate(feature.granted_at)}
                   </span>
@@ -278,5 +284,11 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#6b7280",
     fontSize: 13,
     minWidth: 150,
+  },
+
+  featurePackage: {
+    color: "#6b7280",
+    fontSize: 13,
+    marginTop: 4,
   },
 };

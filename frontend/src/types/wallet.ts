@@ -18,6 +18,7 @@ export type CreditLedgerItem = {
 export type MyFeature = {
   id: string;
   feature_code: string;
+  package_name: string;
   granted_at: string;
   expired_at: string | null;
   revoked_at: string | null;

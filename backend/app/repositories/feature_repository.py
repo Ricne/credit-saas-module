@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.feature import Feature
 from app.models.user_feature import UserFeature
 
+from sqlalchemy import desc
+from app.models.transaction import Transaction
+
 
 class FeatureRepository:
     def __init__(self, db: AsyncSession):
@@ -58,3 +61,32 @@ class FeatureRepository:
 
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
+    
+    async def get_active_user_features(self, user_id: uuid.UUID):
+        stmt = (
+            select(
+                UserFeature.id,
+                UserFeature.feature_code,
+                Transaction.package_name,
+                UserFeature.granted_at,
+                UserFeature.expired_at,
+                UserFeature.revoked_at,
+            )
+            .join(Transaction, Transaction.id == UserFeature.source_transaction_id)
+            .where(UserFeature.user_id == user_id)
+            .where(UserFeature.revoked_at.is_(None))
+            .order_by(UserFeature.feature_code.asc(), desc(UserFeature.granted_at))
+        )
+
+        result = await self.db.execute(stmt)
+        rows = result.mappings().all()
+
+        unique_features = {}
+
+        for row in rows:
+            code = row["feature_code"]
+
+            if code not in unique_features:
+                unique_features[code] = row
+
+        return list(unique_features.values())

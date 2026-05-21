@@ -34,6 +34,7 @@ class MyFeatureResponse(BaseModel):
 
     id: uuid.UUID
     feature_code: str
+    package_name: str
     granted_at: datetime
     expired_at: datetime | None
     revoked_at: datetime | None

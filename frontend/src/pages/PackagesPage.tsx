@@ -16,6 +16,7 @@ type CheckoutForm = {
 
 export function PackagesPage() {
   const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === "ADMIN";
 
   const [packages, setPackages] = useState<Package[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +50,7 @@ export function PackagesPage() {
 
     setCheckoutForm({
       cardholder_name: "",
-      card_number: "4242 4242 4242 4242",
+      card_number: "",
       expiry_month: "12",
       expiry_year: "2030",
       cvv: "123",
@@ -159,10 +160,15 @@ export function PackagesPage() {
                   </span>
                 ))}
               </div>
-
-              <button style={styles.buyButton} onClick={() => openCheckout(item)}>
-                Checkout
-              </button>
+              {isAdmin ? (
+                <div style={styles.adminNotice}>
+                  Admin preview only
+                </div>
+              ) : (
+                <button style={styles.buyButton} onClick={() => openCheckout(item)}>
+                  Checkout
+                </button>
+              )}
             </article>
           ))}
         </div>
@@ -217,7 +223,7 @@ export function PackagesPage() {
                       formatCardNumber(event.target.value)
                     )
                   }
-                  placeholder="4242 4242 4242 4242"
+                  placeholder="1234 1234 1234 1234"
                   required
                 />
               </label>
@@ -258,8 +264,7 @@ export function PackagesPage() {
                     required
                   />
                 </label>
-
-                <label style={styles.field}>
+                <label style={{ ...styles.field, maxWidth: 120 }}>
                   <span>CVV</span>
                   <input
                     style={styles.input}
@@ -288,11 +293,6 @@ export function PackagesPage() {
                   required
                 />
               </label>
-
-              <div style={styles.fakeNotice}>
-                This is a fake payment form for testing only. No card data is
-                stored.
-              </div>
 
               <button
                 style={styles.payButton}
@@ -508,5 +508,15 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#ffffff",
     fontWeight: 900,
     cursor: "pointer",
+  },
+
+  adminNotice: {
+    marginTop: "auto",
+    padding: "12px 14px",
+    borderRadius: 12,
+    background: "#f3f4f6",
+    color: "#6b7280",
+    fontWeight: 800,
+    textAlign: "center",
   },
 };
