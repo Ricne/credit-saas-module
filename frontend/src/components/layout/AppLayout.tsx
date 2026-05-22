@@ -29,13 +29,17 @@ export function AppLayout() {
             Packages
           </NavLink>
 
-          <NavLink to="/wallet" style={navStyle}>
-            Wallet
-          </NavLink>
+          {user?.role === "USER" && (
+            <>
+              <NavLink to="/wallet" style={navStyle}>
+                Wallet
+              </NavLink>
 
-          <NavLink to="/transactions" style={navStyle}>
-            Transactions
-          </NavLink>
+              <NavLink to="/transactions" style={navStyle}>
+                Transactions
+              </NavLink>
+            </>
+          )}
 
           {user?.role === "ADMIN" && (
             <>
